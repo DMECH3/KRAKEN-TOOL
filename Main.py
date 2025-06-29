@@ -19,8 +19,8 @@ Interface="""
                 ╒═══════════════════╦══════════
                 │                   ║
                 │ │1│ Ping          ║
-                │ │2│ Router Scan   ║
-                │ │3│ Port Scanner  ║
+                │ │2│ Port Scanner  ║
+                │ │3│               ║
                 │ │4│                
                 │                   
                 │                   
@@ -44,9 +44,9 @@ while True:
         if shell == 1:
             subprocess.run([f'python', dir + '//scripts//Ping.py'])
         elif shell == 2:
-            subprocess.run([f'python', dir + '//scripts//Scan.py'])
+            subprocess.run([f'python', dir + '//scripts//PortScanner.py'])
         elif shell == 3:
-            subprocess.run([f'python', dir + '//scripts//PortScanner.py'])    
+            subprocess.run([f'python', dir + '//scripts//'])    
         elif shell == 4:
             subprocess.run([f'python', dir + '//scripts//'])    
 
