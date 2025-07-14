@@ -1,65 +1,52 @@
 @echo off
-setlocal
+echo Checking Python version...
 
-set "required_version=3.12.5"
-set "python_url=https://www.python.org/ftp/python/%required_version%/python-%required_version%-amd64.exe"
-set "installer_file=python-installer.exe"
-
-echo Checking if Python is installed...
-
-python --version >nul 2>&1
+REM 
+python --version 2>nul
 if %errorlevel% neq 0 (
-    echo Python is not installed. Installing Python %required_version%...
-    goto install_python
-)
-
-for /f "tokens=2 delims= " %%a in ('python --version 2^>^&1') do set "current_version=%%a"
-echo Python version found: %current_version%
-
-if not "%current_version%"=="%required_version%" (
-    echo Installed version (%current_version%) does not match required (%required_version%). Updating...
+    echo Python is not installed. Installing the latest version...
     goto install_python
 ) else (
-    echo Required Python version is already installed.
+    for /f "tokens=2 delims= " %%a in ('python --version') do set version=%%a
+    echo Python version installed: %version%
+
+    REM 
+    set required_version=3.12.5
+
+    REM 
+    if not "%version%"=="%required_version%" (
+        echo Updating Python to version %required_version%...
+        goto install_python
+    ) else (
+        echo Python is up to date.
+    )
 )
 
-goto install_packages
+REM 
+echo Installing required Python packages...
+pip install colorama
+pip install pystyle
+pip install webbrowser
+pip install requests
+echo All packages installed.
+pause
+exit
 
 :install_python
-echo Downloading Python installer from: %python_url%
-curl -o %installer_file% %python_url%
-if exist %installer_file% (
-    echo Running Python installer...
-    start /wait %installer_file% /quiet InstallAllUsers=1 PrependPath=1 Include_test=0
-) else (
-    echo Failed to download Python installer.
-    pause
-    exit /b 1
-)
+echo Downloading and installing Python %required_version%...
+REM 
+curl -o python-installer.exe https://www.python.org/ftp/python/%required_version%/python-%required_version%-amd64.exe
 
-REM Verify installation
-python --version >nul 2>&1
+REM 
+start /wait python-installer.exe /quiet InstallAllUsers=1 PrependPath=1
+
+REM 
+python --version
 if %errorlevel% neq 0 (
-    echo Python installation failed.
+    echo Failed to install Python. Please install it manually.
     pause
     exit /b 1
+) else (
+    echo Python %required_version% installed successfully.
+    goto :eof
 )
-
-echo Python installed successfully.
-
-REM Clean up installer
-if exist %installer_file% (
-    del /f /q %installer_file%
-    echo Installer file deleted: %installer_file%
-)
-
-goto install_packages
-
-:install_packages
-echo Installing required Python packages...
-pip install --upgrade pip
-pip install pystyle requests
-
-echo All required packages installed successfully.
-pause
-exit /b
